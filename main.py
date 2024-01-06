@@ -5,25 +5,51 @@ from kivy.core.window import Window
 from kivy.uix.image import Image
 from kivymd.uix.list import MDList,OneLineAvatarListItem,ImageLeftWidget
 import time
-import pygame.camera
-import pygame.image
-import sys
+
+
+Window.size = (350,900)
+
+Builder.load_file("homescreen.kv")
+class Homescreen(MDScreen):
+	def __init__(self,**kwargs):
+		super().__init__(**kwargs)
+
+		# GET SELECTOR FROM KV FILE CAMERA 
+		self.mycamera = self.ids.camera
+		self.myimage = Image()
+		self.resultbox = self.ids.resultbox
+		self.mybox = self.ids.mybox
 
 
 
-def captureyouface():
+	def captureyouface(self):
+		# CREATE TIMESTAMP NOT FOR YOU FILE IMAGE
+		# THIS SCRIPT GET TIME MINUTES AND DAY NOW
+		timenow = time.strftime("%Y%m%d_%H%M%S")
 
+		# AND EXPORT YOU CAMERA CAPTURE TO PNG IMAGE
+		self.mycamera.export_to_png("myimage_{}.png".format(timenow))
+		self.myimage.source = "myimage_{}.png".format(timenow)
+		self.resultbox.add_widget(
+			OneLineAvatarListItem(
+				ImageLeftWidget(
+					source="myimage_{}.png".format(timenow),
+					size_hint_x=0.3,
+					size_hint_y=1,
 
- pygame.camera.init()
+					# AND SET YOU WIDHT AND HEIGT YOU PHOTO
+					size=(300,300)
 
- cameras = pygame.camera.list_cameras()
- webcam = pygame.camera.Camera(cameras[0])
- webcam.start()
- img = webcam.get_image()
- pygame.image.save(img,"filename.jpg")
+					),
+				text=self.ids.name.text
+				)
+
+			)
+
 
 class MyApp(MDApp):
-   captureyouface()
+	def build(self):
+		return Homescreen()
 
 if __name__ == "__main__":
 	MyApp().run()
